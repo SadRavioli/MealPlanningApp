@@ -1,0 +1,39 @@
+# .NET Build
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Environment & Secrets
+appsettings.Development.json
+.env
+
+# Logs
+*.log
+
+# Test Results
+TestResults/
+*.trx
+
+# Publish outputs
+[Pp]ublish/
+
+# NuGet
+*.nupkg
+packages/
+
+# OS files
+.DS_Store
+Thumbs.db
