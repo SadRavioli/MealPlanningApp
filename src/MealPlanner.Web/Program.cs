@@ -1,9 +1,13 @@
+using MealPlanner.Application;
 using MealPlanner.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Add Application services (Services, Validators)
+builder.Services.AddApplication();
 
 // Add Infrastructure services (DbContext, Repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
