@@ -73,7 +73,6 @@ public class RecipeService : IRecipeService
 
     public async Task<RecipeDto> ScaleRecipeAsync(int recipeId, int newServings, CancellationToken cancellationToken = default)
     {
-        // Validate new servings
         if (newServings <= 0)
             throw new ArgumentException("New servings must be greater than zero", nameof(newServings));
 
