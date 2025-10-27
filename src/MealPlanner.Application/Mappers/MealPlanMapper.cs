@@ -1,4 +1,4 @@
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.MealPlans;
 using MealPlanner.Domain.Entities;
 
 namespace MealPlanner.Application.Mappers;

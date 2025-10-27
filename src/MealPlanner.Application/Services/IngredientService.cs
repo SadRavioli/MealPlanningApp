@@ -1,7 +1,5 @@
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Ingredients;
 using MealPlanner.Application.Mappers;
-using MealPlanner.Domain.Entities;
-using MealPlanner.Domain.Enums;
 using MealPlanner.Domain.Repositories;
 
 namespace MealPlanner.Application.Services;

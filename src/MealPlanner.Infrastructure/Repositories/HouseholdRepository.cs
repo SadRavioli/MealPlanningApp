@@ -11,7 +11,7 @@ public class HouseholdRepository : Repository<Household>, IHouseholdRepository
     {
     }
 
-    public async Task<IEnumerable<Household>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Household>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         return await _context.UserHouseholds
             .Where(uh => uh.UserId == userId)

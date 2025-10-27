@@ -1,4 +1,6 @@
-namespace MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Recipes;
+
+namespace MealPlanner.Application.DTOs.Ingredients;
 
 public class IngredientDto 
 {

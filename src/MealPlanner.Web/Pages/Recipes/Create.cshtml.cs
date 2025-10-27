@@ -1,4 +1,4 @@
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
 using MealPlanner.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;

@@ -1,7 +1,7 @@
 using FluentValidation;
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Recipes;
 
-namespace MealPlanner.Application.Validators;
+namespace MealPlanner.Application.Validators.Recipes;
 
 public class SaveRecipeDtoValidator : AbstractValidator<SaveRecipeDto>
 {

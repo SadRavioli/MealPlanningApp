@@ -1,4 +1,4 @@
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Recipes;
 
 namespace MealPlanner.Application.Services;
 

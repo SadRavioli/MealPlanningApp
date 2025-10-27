@@ -1,4 +1,4 @@
-using MealPlanner.Application.DTOs;
+using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Mappers;
 using MealPlanner.Domain.Entities;
 using MealPlanner.Domain.Enums;

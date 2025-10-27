@@ -1,6 +1,6 @@
 using MealPlanner.Domain.Enums;
 
-namespace MealPlanner.Application.DTOs;
+namespace MealPlanner.Application.DTOs.MealPlans;
 
 public class SavePlannedMealDto
 {
