@@ -6,6 +6,5 @@ public class Ingredient
     public string Name { get; set; } = string.Empty;
     public string? Category { get; set; }
 
-    // Navigation properties
     public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
 }

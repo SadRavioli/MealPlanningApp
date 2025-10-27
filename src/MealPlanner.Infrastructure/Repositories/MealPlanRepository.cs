@@ -11,7 +11,7 @@ public class MealPlanRepository : Repository<MealPlan>, IMealPlanRepository
     {
     }
 
-    public async Task<IEnumerable<MealPlan>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MealPlan>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(mp => mp.HouseholdId == householdId)

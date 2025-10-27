@@ -17,7 +17,7 @@ public class IngredientRepository : Repository<Ingredient>, IIngredientRepositor
             .FirstOrDefaultAsync(i => i.Name == name, cancellationToken);
     }
 
-    public async Task<IEnumerable<Ingredient>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Ingredient>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(i => i.Name.Contains(searchTerm))
@@ -25,7 +25,7 @@ public class IngredientRepository : Repository<Ingredient>, IIngredientRepositor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Ingredient>> GetByCategoryAsync(string category, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Ingredient>> GetByCategoryAsync(string category, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(i => i.Category == category)

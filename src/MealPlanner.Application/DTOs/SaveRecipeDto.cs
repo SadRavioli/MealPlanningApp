@@ -8,13 +8,5 @@ public class SaveRecipeDto
     public int PrepTimeMinutes { get; set; }
     public int CookTimeMinutes { get; set; }
     public int ServingSize { get; set; }
-    public List<SaveRecipeIngredientDto> Ingredients { get; set; } = new();
-}
-
-public class SaveRecipeIngredientDto
-{
-    public int IngredientId { get; set; }
-    public decimal Quantity { get; set; }
-    public int Unit { get; set; }
-    public string? Notes { get; set; }
+    public IEnumerable<SaveRecipeIngredientDto> Ingredients { get; set; } = new List<SaveRecipeIngredientDto>();
 }

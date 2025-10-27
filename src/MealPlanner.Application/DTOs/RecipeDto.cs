@@ -12,5 +12,5 @@ public class RecipeDto
     public int HouseholdId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<RecipeIngredientDto> Ingredients { get; set; } = new();
+    public IEnumerable<RecipeIngredientDto> Ingredients { get; set; } = new List<RecipeIngredientDto>();
 }

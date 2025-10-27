@@ -15,9 +15,9 @@ public static class DependencyInjection
         // Register application services
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IMealPlanService, MealPlanService>();
+        services.AddScoped<IIngredientService, IngredientService>();
 
         // TODO: Add other services as you create them:
-        // services.AddScoped<IIngredientService, IngredientService>();
         // services.AddScoped<IHouseholdService, HouseholdService>();
 
         return services;

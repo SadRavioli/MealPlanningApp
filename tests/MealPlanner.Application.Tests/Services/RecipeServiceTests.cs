@@ -58,8 +58,8 @@ public class RecipeServiceTests
         result.Should().NotBeNull();
         result.ServingSize.Should().Be(4);
         result.Ingredients.Should().HaveCount(2);
-        result.Ingredients[0].Quantity.Should().Be(1000); // 500 * 2
-        result.Ingredients[1].Quantity.Should().Be(400);  // 200 * 2
+        result.Ingredients.ElementAt(0).Quantity.Should().Be(1000); // 500 * 2
+        result.Ingredients.ElementAt(1).Quantity.Should().Be(400);  // 200 * 2
     }
 
     [Fact]
@@ -101,8 +101,8 @@ public class RecipeServiceTests
         // Assert
         result.Should().NotBeNull();
         result.ServingSize.Should().Be(2);
-        result.Ingredients[0].Quantity.Should().Be(200); // 400 / 2
-        result.Ingredients[1].Quantity.Should().Be(2);   // 4 / 2
+        result.Ingredients.ElementAt(0).Quantity.Should().Be(200); // 400 / 2
+        result.Ingredients.ElementAt(1).Quantity.Should().Be(2);   // 4 / 2
     }
 
     [Fact]

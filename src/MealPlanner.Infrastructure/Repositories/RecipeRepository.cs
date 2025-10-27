@@ -11,7 +11,7 @@ public class RecipeRepository : Repository<Recipe>, IRecipeRepository
     {
     }
 
-    public async Task<IEnumerable<Recipe>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Recipe>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(r => r.HouseholdId == householdId)
@@ -27,7 +27,7 @@ public class RecipeRepository : Repository<Recipe>, IRecipeRepository
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Recipe>> SearchByNameAsync(int householdId, string searchTerm, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Recipe>> SearchByNameAsync(int householdId, string searchTerm, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(r => r.HouseholdId == householdId && r.Name.Contains(searchTerm))

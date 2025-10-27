@@ -6,5 +6,5 @@ public class MealPlanDto
     public int HouseholdId { get; set; }
     public DateTime WeekStartDate { get; set; }
     public DateTime CreatedAt { get; set; }
-    public List<PlannedMealDto> PlannedMeals { get; set; } = new();
+    public IEnumerable<PlannedMealDto> PlannedMeals { get; set; } = new List<PlannedMealDto>();
 }
