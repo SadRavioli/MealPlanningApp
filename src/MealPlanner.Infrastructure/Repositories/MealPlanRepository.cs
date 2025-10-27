@@ -32,4 +32,14 @@ public class MealPlanRepository : Repository<MealPlan>, IMealPlanRepository
                 .ThenInclude(pm => pm.Recipe)
             .FirstOrDefaultAsync(mp => mp.Id == id, cancellationToken);
     }
+
+    public async Task<MealPlan?> GetByIdWithIngredientsAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(mp => mp.PlannedMeals)
+                .ThenInclude(pm => pm.Recipe)
+                    .ThenInclude(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
+            .FirstOrDefaultAsync(mp => mp.Id == id, cancellationToken);
+    }
 }

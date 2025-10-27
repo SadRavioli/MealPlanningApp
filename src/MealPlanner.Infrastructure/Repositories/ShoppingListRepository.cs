@@ -11,7 +11,7 @@ public class ShoppingListRepository : Repository<ShoppingList>, IShoppingListRep
     {
     }
 
-    public async Task<IEnumerable<ShoppingList>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ShoppingList>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(sl => sl.HouseholdId == householdId)
