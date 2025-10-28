@@ -20,7 +20,7 @@ public class IngredientRepository : Repository<Ingredient>, IIngredientRepositor
     public async Task<IReadOnlyList<Ingredient>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Where(i => i.Name.Contains(searchTerm))
+            .Where(i => i.Name.ToLower().Contains(searchTerm.ToLower()))
             .OrderBy(i => i.Name)
             .ToListAsync(cancellationToken);
     }
