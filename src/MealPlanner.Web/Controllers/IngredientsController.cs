@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MealPlanner.Web.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/ingredients")]
 public class IngredientsController : ControllerBase
 {
     private readonly IIngredientService _ingredientService;

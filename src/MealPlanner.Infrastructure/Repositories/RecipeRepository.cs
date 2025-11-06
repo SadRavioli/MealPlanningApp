@@ -30,7 +30,7 @@ public class RecipeRepository : Repository<Recipe>, IRecipeRepository
     public async Task<IReadOnlyList<Recipe>> SearchByNameAsync(int householdId, string searchTerm, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Where(r => r.HouseholdId == householdId && r.Name.Contains(searchTerm))
+            .Where(r => r.HouseholdId == householdId && r.Name.ToLower().Contains(searchTerm.ToLower()))
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
     }
