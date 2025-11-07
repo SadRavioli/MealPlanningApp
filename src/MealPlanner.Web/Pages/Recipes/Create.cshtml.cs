@@ -1,33 +1,40 @@
+using MealPlanner.Application.DTOs.Ingredients;
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
-using MealPlanner.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MealPlanner.Web.Pages.Recipes;
 
 public class CreateModel : PageModel
 {
     private readonly IRecipeService _recipeService;
-    private readonly IIngredientRepository _ingredientRepository;
+    private readonly IIngredientService _ingredientService;
 
-    public CreateModel(IRecipeService recipeService, IIngredientRepository ingredientRepository)
+    public CreateModel(IRecipeService recipeService, IIngredientService ingredientService)
     {
         _recipeService = recipeService;
-        _ingredientRepository = ingredientRepository;
+        _ingredientService = ingredientService;
     }
 
     [BindProperty]
     public SaveRecipeDto Recipe { get; set; } = new();
 
-    public SelectList? AvailableIngredients { get; set; }
+    public IEnumerable<IngredientDto> AvailableIngredients { get; set; } = new List<IngredientDto>();
 
     public async Task OnGetAsync()
     {
         // Load available ingredients for dropdown
-        var ingredients = await _ingredientRepository.GetAllAsync();
-        AvailableIngredients = new SelectList(ingredients, "Id", "Name");
+        AvailableIngredients = await _ingredientService.GetAllIngredientsAsync();
+    }
+
+    public async Task<IActionResult> OnGetAddIngredientRowAsync(int index)
+    {
+        // Load available ingredients
+        var ingredients = await _ingredientService.GetAllIngredientsAsync();
+
+        // Return partial view for new ingredient row
+        return Partial("_IngredientRow", (index, ingredients));
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -35,8 +42,7 @@ public class CreateModel : PageModel
         if (!ModelState.IsValid)
         {
             // Reload ingredients if validation fails
-            var ingredients = await _ingredientRepository.GetAllAsync();
-            AvailableIngredients = new SelectList(ingredients, "Id", "Name");
+            AvailableIngredients = await _ingredientService.GetAllIngredientsAsync();
             return Page();
         }
 
