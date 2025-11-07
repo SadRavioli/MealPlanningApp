@@ -20,7 +20,7 @@ MealPlanner.sln
 ## Tech Stack
 
 - .NET 9.0
-- ASP.NET Core MVC + Razor Pages
+- ASP.NET Core + Razor Pages
 - Entity Framework Core
 - SQLite (local development) / PostgreSQL (production)
 - ASP.NET Core Identity
