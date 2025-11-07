@@ -37,3 +37,6 @@ packages/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Planning documents (local only)
+Implementation.md

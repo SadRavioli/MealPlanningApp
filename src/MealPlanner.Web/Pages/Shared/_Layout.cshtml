@@ -1,50 +1,136 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    var isHome = currentPage == "/Index" || currentPage == "";
+    var isRecipes = currentPage.StartsWith("/Recipes");
+    var isMealPlans = currentPage.StartsWith("/MealPlans");
+}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MealPlanner.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MealPlanner.Web.styles.css" asp-append-version="true" />
+    <meta name="theme-color" content="#a855f7" />
+    <title>@ViewData["Title"] - Meal Planner</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/index">JDog's MealPlanner</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/recipes/index">Recipes</a>
-                        </li>
-                    </ul>
+<body class="h-full bg-gray-50">
+    <div class="flex flex-col h-full">
+        <!-- Desktop Top Navigation (hidden on mobile) -->
+        <header class="hidden md:block bg-white border-b border-gray-200">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a asp-area="" asp-page="/Index" class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent">
+                                Meal Planner
+                            </a>
+                        </div>
+                        <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
+                            <a asp-area="" asp-page="/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isHome ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
+                                Dashboard
+                            </a>
+                            <a asp-area="" asp-page="/Recipes/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isRecipes ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
+                                Recipes
+                            </a>
+                            <a asp-area="" asp-page="/MealPlans/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isMealPlans ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
+                                Meal Plan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto pb-20 md:pb-0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                @RenderBody()
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation (hidden on desktop) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-inset-bottom">
+            <div class="flex justify-around items-center h-16">
+                <!-- Home -->
+                <a asp-area="" asp-page="/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isHome ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="text-xs mt-1">Home</span>
+                </a>
+
+                <!-- Plan -->
+                <a asp-area="" asp-page="/MealPlans/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isMealPlans ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-xs mt-1">Plan</span>
+                </a>
+
+                <!-- Recipes -->
+                <a asp-area="" asp-page="/Recipes/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isRecipes ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span class="text-xs mt-1">Recipes</span>
+                </a>
+
+                <!-- More -->
+                <div x-data="{ open: false }" class="flex flex-col items-center justify-center flex-1 py-2">
+                    <button @@click="open = !open" class="flex flex-col items-center justify-center text-gray-600 hover:text-primary-500 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <span class="text-xs mt-1">More</span>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="open"
+                         x-transition
+                         @@click.away="open = false"
+                         class="absolute bottom-16 right-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48">
+                        <a asp-area="" asp-page="/Shopping/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Shopping List</a>
+                        <a asp-area="" asp-page="/Pantry/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Pantry</a>
+                        <hr class="my-2">
+                        <a asp-area="" asp-page="/Settings/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                    </div>
                 </div>
             </div>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - MealPlanner.Web - <a asp-area="" asp-page="/privacy">Privacy</a>
-        </div>
-    </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
