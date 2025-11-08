@@ -11,9 +11,19 @@ public class MealPlanRepository : Repository<MealPlan>, IMealPlanRepository
     {
     }
 
+    public override async Task<MealPlan?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(mp => mp.PlannedMeals)
+                .ThenInclude(pm => pm.Recipe)
+            .FirstOrDefaultAsync(mp => mp.Id == id, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<MealPlan>> GetByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
+            .Include(mp => mp.PlannedMeals)
+                .ThenInclude(pm => pm.Recipe)
             .Where(mp => mp.HouseholdId == householdId)
             .OrderByDescending(mp => mp.WeekStartDate)
             .ToListAsync(cancellationToken);

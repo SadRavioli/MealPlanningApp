@@ -21,6 +21,17 @@
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add antiforgery token to all HTMX requests
+            document.body.addEventListener('htmx:configRequest', function(evt) {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                if (token && evt.detail.verb !== 'get') {
+                    evt.detail.parameters['__RequestVerificationToken'] = token;
+                }
+            });
+        });
+    </script>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

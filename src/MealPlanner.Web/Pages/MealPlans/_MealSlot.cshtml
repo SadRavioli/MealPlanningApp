@@ -1,0 +1,80 @@
+@using MealPlanner.Domain.Enums
+@using MealPlanner.Application.DTOs.MealPlans
+@model (DayOfWeek dayOfWeek, MealType mealType, PlannedMealDto? plannedMeal, DateTime weekStartDate)
+
+@if (Model.plannedMeal != null)
+{
+    <!-- Meal card with recipe -->
+    <div class="meal-slot bg-white border border-primary-200 rounded-lg p-3 shadow-sm relative"
+         x-data="{ open: false, showDelete: false }"
+         @@mouseenter="showDelete = true"
+         @@mouseleave="showDelete = false">
+        <div @@click="open = !open" class="cursor-pointer">
+            <h4 class="font-medium text-gray-900 text-sm mb-1">@Model.plannedMeal.RecipeName</h4>
+            <p class="text-xs text-gray-600">@Model.plannedMeal.Servings servings</p>
+            @if (!string.IsNullOrEmpty(Model.plannedMeal.Notes))
+            {
+                <p class="text-xs text-gray-500 mt-1">@Model.plannedMeal.Notes</p>
+            }
+        </div>
+
+        <!-- Remove button -->
+        <button type="button"
+                x-show="showDelete"
+                x-transition
+                @@click.stop
+                hx-post="/MealPlans/Index?handler=RemoveMeal"
+                hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'
+                hx-target="closest .meal-slot-container"
+                hx-swap="innerHTML"
+                class="absolute top-2 right-2 p-1 text-red-600 hover:bg-red-50 rounded z-10"
+                style="display: none;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Recipe dropdown for changing meal -->
+        <div x-show="open"
+             x-transition
+             class="absolute z-50 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto left-0 top-full"
+             style="display: none;"
+             @@htmx:afterSwap.window="open = false"
+             @@click.outside="open = false">
+            <div hx-get="/MealPlans/Index?handler=RecipeList"
+                 hx-trigger="intersect once"
+                 hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
+                <p class="text-sm text-gray-500 p-2">Loading recipes...</p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Empty slot with add button and dropdown -->
+    <div class="meal-slot flex items-center justify-center h-full min-h-[80px]" x-data="{ open: false }">
+        <div class="relative">
+            <button type="button"
+                    @@click="open = !open"
+                    class="text-gray-400 hover:text-primary-500 transition-colors p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+
+            <!-- Recipe dropdown -->
+            <div x-show="open"
+                 x-transition
+                 class="absolute z-50 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto left-0"
+                 style="display: none;"
+                 @@htmx:afterSwap.window="open = false"
+                 @@click.outside="open = false">
+                <div hx-get="/MealPlans/Index?handler=RecipeList"
+                     hx-trigger="intersect once"
+                     hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
+                    <p class="text-sm text-gray-500 p-2">Loading recipes...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}

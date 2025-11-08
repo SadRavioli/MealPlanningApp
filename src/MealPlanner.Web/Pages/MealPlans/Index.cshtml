@@ -9,6 +9,10 @@
     var nextWeek = Model.WeekStartDate.AddDays(7);
 }
 
+<form method="post">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="space-y-6">
     <!-- Header with Week Navigation -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -68,27 +72,9 @@
                     var isToday = date.Date == DateTime.Today;
 
                     <div class="p-3 border-r border-gray-200 hover:bg-gray-50 transition-colors @(isToday ? "bg-primary-50/30" : "")">
-                        @if (plannedMeal != null)
-                        {
-                            <div class="meal-slot bg-white border border-primary-200 rounded-lg p-3 shadow-sm">
-                                <h4 class="font-medium text-gray-900 text-sm mb-1">@plannedMeal.RecipeName</h4>
-                                <p class="text-xs text-gray-600">@plannedMeal.Servings servings</p>
-                                @if (!string.IsNullOrEmpty(plannedMeal.Notes))
-                                {
-                                    <p class="text-xs text-gray-500 mt-1">@plannedMeal.Notes</p>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="meal-slot flex items-center justify-center h-full min-h-[80px]">
-                                <button class="text-gray-400 hover:text-primary-500 transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                            </div>
-                        }
+                        <div class="meal-slot-container">
+                            <partial name="_MealSlot" model="(day, mealType, plannedMeal, Model.WeekStartDate)" />
+                        </div>
                     </div>
                 }
             </div>
@@ -119,26 +105,9 @@
 
                         <div class="p-4">
                             <h4 class="font-medium text-gray-700 mb-2">@mealType.ToString()</h4>
-                            @if (plannedMeal != null)
-                            {
-                                <div class="bg-primary-50 border border-primary-200 rounded-lg p-3">
-                                    <h5 class="font-medium text-gray-900">@plannedMeal.RecipeName</h5>
-                                    <p class="text-sm text-gray-600 mt-1">@plannedMeal.Servings servings</p>
-                                    @if (!string.IsNullOrEmpty(plannedMeal.Notes))
-                                    {
-                                        <p class="text-sm text-gray-500 mt-1">@plannedMeal.Notes</p>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <button class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-primary-400 hover:text-primary-500 transition-colors">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <span class="block text-xs mt-1">Add meal</span>
-                                </button>
-                            }
+                            <div class="meal-slot-container">
+                                <partial name="_MealSlot" model="(day, mealType, plannedMeal, Model.WeekStartDate)" />
+                            </div>
                         </div>
                     }
                 </div>
