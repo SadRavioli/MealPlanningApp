@@ -9,8 +9,8 @@ public enum MeasurementUnit
     Pound = 4,
 
     // Volume
-    Milliliter = 10,
-    Liter = 11,
+    Millilitre = 10,
+    Litre = 11,
     Teaspoon = 12,
     Tablespoon = 13,
     Cup = 14,

@@ -36,7 +36,7 @@ public class RecipeService : IRecipeService
 
     public async Task UpdateRecipeAsync(int id, SaveRecipeDto dto, CancellationToken cancellationToken = default)
     {
-        var recipe = await _recipeRepository.GetByIdAsync(id, cancellationToken);
+        var recipe = await _recipeRepository.GetByIdWithIngredientsAsync(id, cancellationToken);
         if (recipe == null)
             throw new KeyNotFoundException($"Recipe with ID {id} not found");
 
@@ -49,15 +49,44 @@ public class RecipeService : IRecipeService
         recipe.ServingSize = dto.ServingSize;
         recipe.UpdatedAt = DateTime.UtcNow;
 
-        // Update ingredients
-        recipe.RecipeIngredients = [.. dto.Ingredients.Select(i => new RecipeIngredient
+        // Update ingredients using Remove/Update/Add pattern
+        // 1. Remove ingredients that are no longer in the DTO
+        var dtoIngredientIds = dto.Ingredients.Select(i => i.IngredientId).ToHashSet();
+        var ingredientsToRemove = recipe.RecipeIngredients
+            .Where(ri => !dtoIngredientIds.Contains(ri.IngredientId))
+            .ToList();
+
+        foreach (var ingredient in ingredientsToRemove)
         {
-            RecipeId = recipe.Id,
-            IngredientId = i.IngredientId,
-            Quantity = i.Quantity,
-            Unit = (MeasurementUnit)i.Unit,
-            Notes = i.Notes
-        })];
+            recipe.RecipeIngredients.Remove(ingredient);
+        }
+
+        // 2. Update existing ingredients or add new ones
+        foreach (var dtoIngredient in dto.Ingredients)
+        {
+            var existingIngredient = recipe.RecipeIngredients
+                .FirstOrDefault(ri => ri.IngredientId == dtoIngredient.IngredientId);
+
+            if (existingIngredient != null)
+            {
+                // Update existing ingredient
+                existingIngredient.Quantity = dtoIngredient.Quantity;
+                existingIngredient.Unit = (MeasurementUnit)dtoIngredient.Unit;
+                existingIngredient.Notes = dtoIngredient.Notes;
+            }
+            else
+            {
+                // Add new ingredient
+                recipe.RecipeIngredients.Add(new RecipeIngredient
+                {
+                    RecipeId = recipe.Id,
+                    IngredientId = dtoIngredient.IngredientId,
+                    Quantity = dtoIngredient.Quantity,
+                    Unit = (MeasurementUnit)dtoIngredient.Unit,
+                    Notes = dtoIngredient.Notes
+                });
+            }
+        }
 
         await _recipeRepository.UpdateAsync(recipe, cancellationToken);
     }

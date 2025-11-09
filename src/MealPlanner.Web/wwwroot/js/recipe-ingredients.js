@@ -13,7 +13,8 @@ async function addIngredient(pageHandler) {
 
     try {
         // Fetch new ingredient row from server
-        const response = await fetch(`${pageHandler}?handler=AddIngredientRow&index=${ingredientIndex}`);
+        const separator = pageHandler.includes('?') ? '&' : '?';
+        const response = await fetch(`${pageHandler}${separator}handler=AddIngredientRow&index=${ingredientIndex}`);
 
         if (!response.ok) {
             throw new Error('Failed to load ingredient row');
