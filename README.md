@@ -32,7 +32,7 @@ MealPlanner.sln
 
 ### Prerequisites
 
-- .NET 8.0 SDK
+- .NET 9.0 SDK
 - Visual Studio 2022 or VS Code
 
 ### Running Locally
