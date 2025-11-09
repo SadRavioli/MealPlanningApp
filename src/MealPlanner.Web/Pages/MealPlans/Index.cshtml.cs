@@ -2,11 +2,13 @@ using MealPlanner.Application.DTOs.MealPlans;
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
 using MealPlanner.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MealPlanner.Web.Pages.MealPlans;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly IMealPlanService _mealPlanService;

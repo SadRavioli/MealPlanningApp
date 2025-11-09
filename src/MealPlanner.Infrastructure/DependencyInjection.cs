@@ -1,6 +1,8 @@
+using MealPlanner.Application.Services;
 using MealPlanner.Domain.Repositories;
 using MealPlanner.Infrastructure.Data;
 using MealPlanner.Infrastructure.Repositories;
+using MealPlanner.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +38,9 @@ public static class DependencyInjection
         services.AddScoped<IHouseholdRepository, HouseholdRepository>();
         services.AddScoped<IShoppingListRepository, ShoppingListRepository>();
         services.AddScoped<IPantryRepository, PantryRepository>();
+
+        // Services that depend on Infrastructure (Identity)
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

@@ -1,0 +1,17 @@
+@using MealPlanner.Infrastructure.Identity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <form asp-page="/Account/Logout" method="post" class="inline">
+        <button type="submit" class="text-gray-700 hover:text-gray-900">
+            Logout
+        </button>
+    </form>
+}
+else
+{
+    <a asp-page="/Account/Login" class="text-gray-700 hover:text-gray-900">Login</a>
+    <a asp-page="/Account/Register" class="text-gray-700 hover:text-gray-900">Register</a>
+}

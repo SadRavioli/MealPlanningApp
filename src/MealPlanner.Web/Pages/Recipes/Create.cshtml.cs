@@ -1,11 +1,13 @@
 using MealPlanner.Application.DTOs.Ingredients;
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MealPlanner.Web.Pages.Recipes;
 
+[Authorize]
 public class CreateModel : PageModel
 {
     private readonly IRecipeService _recipeService;
