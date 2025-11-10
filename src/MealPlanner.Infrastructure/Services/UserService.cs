@@ -100,14 +100,17 @@ public class UserService : IUserService
 
         _logger.LogInformation("User credentials verified for {Email}", dto.Email);
 
-        // TODO: Get user's household ID from UserHousehold table
+        // Get user's household
+        var households = await _householdRepository.GetByUserIdAsync(user.Id, cancellationToken);
+        var household = households.FirstOrDefault();
+
         var userDto = new UserDto
         {
             Id = user.Id,
             Email = user.Email!,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            HouseholdId = null // Will be populated from UserHousehold later
+            HouseholdId = household?.Id
         };
 
         return (true, userDto);
@@ -128,14 +131,17 @@ public class UserService : IUserService
             return null;
         }
 
-        // TODO: Get user's household ID from UserHousehold table
+        // Get user's household (first one for MVP - users can have multiple)
+        var households = await _householdRepository.GetByUserIdAsync(userId, cancellationToken);
+        var household = households.FirstOrDefault();
+
         return new UserDto
         {
             Id = user.Id,
             Email = user.Email!,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            HouseholdId = null
+            HouseholdId = household?.Id
         };
     }
 
@@ -147,14 +153,17 @@ public class UserService : IUserService
             return null;
         }
 
-        // TODO: Get user's household ID from UserHousehold table
+        // Get user's household (first one for MVP - users can have multiple)
+        var households = await _householdRepository.GetByUserIdAsync(user.Id, cancellationToken);
+        var household = households.FirstOrDefault();
+
         return new UserDto
         {
             Id = user.Id,
             Email = user.Email!,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            HouseholdId = null
+            HouseholdId = household?.Id
         };
     }
 }

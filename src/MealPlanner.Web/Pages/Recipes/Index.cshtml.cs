@@ -1,5 +1,6 @@
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
+using MealPlanner.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -36,11 +37,13 @@ public class IndexModel : PageModel
 
     private async Task LoadRecipesAsync()
     {
-        // TODO: Get householdId from authenticated user when auth is added
-        // For now, hardcode to 1 for testing
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return;
+        }
 
-        var recipes = await _recipeService.GetRecipesByHouseholdAsync(householdId);
+        var recipes = await _recipeService.GetRecipesByHouseholdAsync(householdId.Value);
 
         // Filter recipes if search term is provided
         if (!string.IsNullOrWhiteSpace(SearchTerm))

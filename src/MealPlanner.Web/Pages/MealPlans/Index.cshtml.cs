@@ -2,6 +2,7 @@ using MealPlanner.Application.DTOs.MealPlans;
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
 using MealPlanner.Domain.Enums;
+using MealPlanner.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -35,24 +36,30 @@ public class IndexModel : PageModel
         // Calculate the start of the week (Sunday)
         WeekStartDate = targetDate.AddDays(-(int)targetDate.DayOfWeek);
 
-        // TODO: Get householdId from authenticated user when auth is added
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return;
+        }
 
         // Try to get existing meal plan for this week
-        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId);
+        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId.Value);
         MealPlan = mealPlans.FirstOrDefault(mp => mp.WeekStartDate.Date == WeekStartDate.Date);
 
         // Load available recipes for the household
-        AvailableRecipes = await _recipeService.GetRecipesByHouseholdAsync(householdId);
+        AvailableRecipes = await _recipeService.GetRecipesByHouseholdAsync(householdId.Value);
     }
 
     public async Task<IActionResult> OnPostAddMealAsync(int recipeId, DayOfWeek dayOfWeek, MealType mealType, DateTime weekStartDate)
     {
-        // TODO: Get householdId from authenticated user when auth is added
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return Unauthorized();
+        }
 
         // Get or create meal plan for this week
-        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId);
+        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId.Value);
         var mealPlan = mealPlans.FirstOrDefault(mp => mp.WeekStartDate.Date == weekStartDate.Date);
 
         // Get the recipe to determine default servings
@@ -79,7 +86,7 @@ public class IndexModel : PageModel
                 PlannedMeals = new List<SavePlannedMealDto> { newPlannedMeal }
             };
 
-            await _mealPlanService.CreateMealPlanAsync(householdId, saveMealPlanDto);
+            await _mealPlanService.CreateMealPlanAsync(householdId.Value, saveMealPlanDto);
         }
         else
         {
@@ -112,11 +119,14 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostRemoveMealAsync(DayOfWeek dayOfWeek, MealType mealType, DateTime weekStartDate)
     {
-        // TODO: Get householdId from authenticated user when auth is added
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return Unauthorized();
+        }
 
         // Get existing meal plan
-        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId);
+        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId.Value);
         var mealPlan = mealPlans.FirstOrDefault(mp => mp.WeekStartDate.Date == weekStartDate.Date);
 
         if (mealPlan == null)
@@ -150,19 +160,27 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGetRecipeListAsync(DayOfWeek dayOfWeek, MealType mealType, DateTime weekStartDate)
     {
-        // TODO: Get householdId from authenticated user when auth is added
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return Unauthorized();
+        }
 
-        AvailableRecipes = await _recipeService.GetRecipesByHouseholdAsync(householdId);
+        AvailableRecipes = await _recipeService.GetRecipesByHouseholdAsync(householdId.Value);
 
         return Partial("_RecipeList", (AvailableRecipes, dayOfWeek, mealType, weekStartDate));
     }
 
     private async Task<IActionResult> GetMealSlotPartial(DayOfWeek dayOfWeek, MealType mealType, DateTime weekStartDate)
     {
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return Unauthorized();
+        }
+
         // Reload meal plan
-        var householdId = 1;
-        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId);
+        var mealPlans = await _mealPlanService.GetMealPlansByHouseholdAsync(householdId.Value);
         var mealPlan = mealPlans.FirstOrDefault(mp => mp.WeekStartDate.Date == weekStartDate.Date);
 
         var plannedMeal = mealPlan?.PlannedMeals

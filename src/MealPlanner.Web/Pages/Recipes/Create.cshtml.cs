@@ -1,6 +1,7 @@
 using MealPlanner.Application.DTOs.Ingredients;
 using MealPlanner.Application.DTOs.Recipes;
 using MealPlanner.Application.Services;
+using MealPlanner.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -48,10 +49,13 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        // TODO: Get householdId from authenticated user when auth is added
-        var householdId = 1;
+        var householdId = User.GetHouseholdId();
+        if (householdId == null)
+        {
+            return RedirectToPage("/Account/Login");
+        }
 
-        await _recipeService.CreateRecipeAsync(householdId, Recipe);
+        await _recipeService.CreateRecipeAsync(householdId.Value, Recipe);
         return RedirectToPage("./Index");
     }
 }
