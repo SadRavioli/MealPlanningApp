@@ -4,22 +4,26 @@
 
 @if (Model.recipes.Any())
 {
-    @foreach (var recipe in Model.recipes.OrderBy(r => r.Name))
-    {
-        <button type="button"
-                hx-post="/MealPlans/Index?handler=AddMeal"
-                hx-vals='{"recipeId": @recipe.Id, "dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'
-                hx-target="closest .meal-slot-container"
-                hx-swap="innerHTML"
-                hx-indicator=".htmx-indicator"
-                class="w-full text-left px-3 py-2 hover:bg-primary-50 transition-colors text-sm border-b border-gray-100 last:border-0">
-            <div class="font-medium text-gray-900">@recipe.Name</div>
-            @if (!string.IsNullOrEmpty(recipe.Description))
-            {
-                <div class="text-xs text-gray-600 truncate">@recipe.Description</div>
-            }
-        </button>
-    }
+    <div class="overflow-hidden rounded-b-2xl lg:rounded-b-xl">
+        @foreach (var recipe in Model.recipes.OrderBy(r => r.Name))
+        {
+            <button type="button"
+                    hx-post="/MealPlans/Index?handler=AddMeal"
+                    hx-vals='{"recipeId": @recipe.Id, "dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'
+                    hx-target="closest .meal-slot-container"
+                    hx-swap="innerHTML"
+                    hx-indicator=".htmx-indicator"
+                    class="w-full text-left px-3 py-2 hover:bg-primary-50 transition-colors text-sm border-t border-gray-100 first:border-0"
+                    x-show="search === '' || '@recipe.Name@(!string.IsNullOrEmpty(recipe.Description) ? " " + recipe.Description : "")'.toLowerCase().includes(search.toLowerCase())"
+                    x-transition>
+                <div class="font-medium text-gray-900">@recipe.Name</div>
+                @if (!string.IsNullOrEmpty(recipe.Description))
+                {
+                    <div class="text-xs text-gray-600 truncate">@recipe.Description</div>
+                }
+            </button>
+        }
+    </div>
 }
 else
 {

@@ -6,9 +6,10 @@
 {
     <!-- Meal card with recipe -->
     <div class="meal-slot bg-white border border-primary-200 rounded-lg p-3 pb-12 shadow-sm relative min-h-[120px]"
-         x-data="{ open: false, showDelete: false }"
+         x-data="{ open: false, showDelete: false, flipUp: false, search: '' }"
          @@mouseenter="showDelete = true"
-         @@mouseleave="showDelete = false">
+         @@mouseleave="showDelete = false"
+         x-init="$watch('open', value => { if(value && window.innerWidth >= 1024) { const rect = $el.getBoundingClientRect(); flipUp = rect.bottom + 270 > window.innerHeight; } if(!value) { search = ''; } })">
         <h4 class="font-medium text-gray-900 text-sm mb-1">@Model.plannedMeal.RecipeName</h4>
         <p class="text-xs text-gray-600">@Model.plannedMeal.Servings servings</p>
         @if (!string.IsNullOrEmpty(Model.plannedMeal.Notes))
@@ -49,17 +50,51 @@
             </button>
         </div>
 
-        <!-- Recipe dropdown for changing meal -->
+        <!-- Recipe modal -->
         <div x-show="open"
-             x-transition
-             class="absolute z-50 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto left-0 top-full"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 bg-black bg-opacity-50"
+             :class="window.innerWidth >= 1024 ? 'flex items-center justify-center p-4' : ''"
              style="display: none;"
-             @@htmx:afterSwap.window="open = false"
-             @@click.outside="open = false">
-            <div hx-get="/MealPlans/Index?handler=RecipeList"
-                 hx-trigger="intersect once"
-                 hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
-                <p class="text-sm text-gray-500 p-2">Loading recipes...</p>
+             @@click="open = false">
+            <div @@click.stop
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="translate-y-full lg:scale-95"
+                 x-transition:enter-end="translate-y-0 lg:scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="translate-y-0 lg:scale-100"
+                 x-transition:leave-end="translate-y-full lg:scale-95"
+                 class="bg-white w-full flex flex-col"
+                 :class="window.innerWidth < 1024 ? 'absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[95vh]' : 'max-w-2xl max-h-[90vh] rounded-xl'">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-900">Select Recipe</h3>
+                    <button @@click="open = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- Search bar -->
+                <div class="p-4 border-b">
+                    <input type="text"
+                           x-model="search"
+                           placeholder="Search recipes..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+                <!-- Recipe list -->
+                <div class="overflow-y-auto flex-1 min-h-[300px]">
+                    <div hx-get="/MealPlans/Index?handler=RecipeList"
+                         hx-trigger="intersect once"
+                         hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
+                        <p class="text-sm text-gray-500 p-4">Loading recipes...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -67,7 +102,9 @@
 else
 {
     <!-- Empty slot with add button and dropdown -->
-    <div class="meal-slot flex items-center justify-center h-full min-h-[120px]" x-data="{ open: false }">
+    <div class="meal-slot flex items-center justify-center h-full min-h-[120px]"
+         x-data="{ open: false, flipUp: false, search: '' }"
+         x-init="$watch('open', value => { if(value && window.innerWidth >= 1024) { const rect = $el.getBoundingClientRect(); flipUp = rect.bottom + 270 > window.innerHeight; } if(!value) { search = ''; } })">
         <div class="relative">
             <button type="button"
                     @@click="open = !open"
@@ -77,17 +114,51 @@ else
                 </svg>
             </button>
 
-            <!-- Recipe dropdown -->
+            <!-- Recipe modal -->
             <div x-show="open"
-                 x-transition
-                 class="absolute z-50 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto left-0"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 z-50 bg-black bg-opacity-50"
+                 :class="window.innerWidth >= 1024 ? 'flex items-center justify-center p-4' : ''"
                  style="display: none;"
-                 @@htmx:afterSwap.window="open = false"
-                 @@click.outside="open = false">
-                <div hx-get="/MealPlans/Index?handler=RecipeList"
-                     hx-trigger="intersect once"
-                     hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
-                    <p class="text-sm text-gray-500 p-2">Loading recipes...</p>
+                 @@click="open = false">
+                <div @@click.stop
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="translate-y-full lg:scale-95"
+                     x-transition:enter-end="translate-y-0 lg:scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="translate-y-0 lg:scale-100"
+                     x-transition:leave-end="translate-y-full lg:scale-95"
+                     class="bg-white w-full flex flex-col"
+                     :class="window.innerWidth < 1024 ? 'absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[95vh]' : 'max-w-2xl max-h-[90vh] rounded-xl'">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-4 border-b">
+                        <h3 class="text-lg font-semibold text-gray-900">Select Recipe</h3>
+                        <button @@click="open = false" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Search bar -->
+                    <div class="p-4 border-b">
+                        <input type="text"
+                               x-model="search"
+                               placeholder="Search recipes..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                    <!-- Recipe list -->
+                    <div class="overflow-y-auto flex-1 min-h-[300px]">
+                        <div hx-get="/MealPlans/Index?handler=RecipeList"
+                             hx-trigger="intersect once"
+                             hx-vals='{"dayOfWeek": @((int)Model.dayOfWeek), "mealType": @((int)Model.mealType), "weekStartDate": "@Model.weekStartDate.ToString("yyyy-MM-dd")"}'>
+                            <p class="text-sm text-gray-500 p-4">Loading recipes...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
