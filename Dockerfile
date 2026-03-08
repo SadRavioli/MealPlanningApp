@@ -10,6 +10,11 @@ COPY src/MealPlanner.Application/*.csproj src/MealPlanner.Application/
 COPY src/MealPlanner.Infrastructure/*.csproj src/MealPlanner.Infrastructure/
 COPY src/MealPlanner.Web/*.csproj src/MealPlanner.Web/
 
+# Copy test project files as well, because the .sln expects them
+COPY tests/MealPlanner.Domain.Tests/*.csproj tests/MealPlanner.Domain.Tests/
+COPY tests/MealPlanner.Application.Tests/*.csproj tests/MealPlanner.Application.Tests/
+COPY tests/MealPlanner.Infrastructure.Tests/*.csproj tests/MealPlanner.Infrastructure.Tests/
+
 # Restore dependencies
 RUN dotnet restore
 
