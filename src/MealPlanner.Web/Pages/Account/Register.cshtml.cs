@@ -36,29 +36,37 @@ public class RegisterModel : PageModel
 
         if (ModelState.IsValid)
         {
-            var dto = new RegisterDto
+            try
             {
-                FirstName = Input.FirstName,
-                LastName = Input.LastName,
-                Email = Input.Email,
-                Password = Input.Password
-            };
+                var dto = new RegisterDto
+                {
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    Email = Input.Email,
+                    Password = Input.Password
+                };
 
-            var (succeeded, user, errors) = await _userService.RegisterAsync(dto);
+                var (succeeded, user, errors) = await _userService.RegisterAsync(dto);
 
-            if (succeeded && user != null)
-            {
-                _logger.LogInformation("User {Email} registered successfully", Input.Email);
-                // Redirect to login page after successful registration
-                return RedirectToPage("/Account/Login", new { returnUrl });
+                if (succeeded && user != null)
+                {
+                    _logger.LogInformation("User {Email} registered successfully", Input.Email);
+                    // Redirect to login page after successful registration
+                    return RedirectToPage("/Account/Login", new { returnUrl });
+                }
+
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error);
+                }
+
+                ErrorMessage = "Unable to create account. Please check the errors below.";
             }
-
-            foreach (var error in errors)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, error);
+                _logger.LogError(ex, "CRITICAL: Registration failed for {Email} due to an unhandled exception.", Input.Email);
+                ErrorMessage = "A system error occurred while creating your account. The technical details have been logged.";
             }
-
-            ErrorMessage = "Unable to create account. Please check the errors below.";
         }
 
         return Page();

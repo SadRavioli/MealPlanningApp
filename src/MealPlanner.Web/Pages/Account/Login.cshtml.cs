@@ -52,29 +52,37 @@ public class LoginModel : PageModel
 
         if (ModelState.IsValid)
         {
-            var dto = new LoginDto
+            try
             {
-                Email = Input.Email,
-                Password = Input.Password,
-                RememberMe = Input.RememberMe
-            };
-
-            // Verify credentials with UserService
-            var (succeeded, user) = await _userService.LoginAsync(dto);
-
-            if (succeeded && user != null)
-            {
-                // Sign in using SignInManager
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-
-                if (result.Succeeded)
+                var dto = new LoginDto
                 {
-                    _logger.LogInformation("User {Email} logged in", Input.Email);
-                    return LocalRedirect(returnUrl);
-                }
-            }
+                    Email = Input.Email,
+                    Password = Input.Password,
+                    RememberMe = Input.RememberMe
+                };
 
-            ErrorMessage = "Invalid login attempt.";
+                // Verify credentials with UserService
+                var (succeeded, user) = await _userService.LoginAsync(dto);
+
+                if (succeeded && user != null)
+                {
+                    // Sign in using SignInManager
+                    var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User {Email} logged in", Input.Email);
+                        return LocalRedirect(returnUrl);
+                    }
+                }
+
+                ErrorMessage = "Invalid login attempt.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "CRITICAL: Login failed for {Email} due to an unhandled exception.", Input.Email);
+                ErrorMessage = "A system error occurred during login. The technical details have been logged.";
+            }
             return Page();
         }
 
