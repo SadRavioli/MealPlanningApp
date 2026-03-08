@@ -19,11 +19,19 @@ public static class DependencyInjection
 
         // Handle Railway DATABASE_URL if present
         var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-        if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgres://"))
+        if (!string.IsNullOrEmpty(databaseUrl) && (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://")))
         {
-            var uri = new Uri(databaseUrl);
+            // Normalize to postgres:// for Uri parser if it's postgresql://
+            var uriString = databaseUrl.Replace("postgresql://", "postgres://");
+            var uri = new Uri(uriString);
             var userInfo = uri.UserInfo.Split(':');
-            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=True";
+            var host = uri.Host;
+            var port = uri.Port;
+            var database = uri.AbsolutePath.TrimStart('/');
+            var username = userInfo[0];
+            var password = userInfo[1];
+
+            connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=True";
         }
 
         services.AddDbContext<ApplicationDbContext>(options =>
