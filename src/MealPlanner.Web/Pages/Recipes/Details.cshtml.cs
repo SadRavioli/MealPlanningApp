@@ -30,4 +30,10 @@ public class DetailsModel : PageModel
         Recipe = recipe;
         return Page();
     }
+
+    public async Task<IActionResult> OnGetScaleAsync(int id, int servings)
+    {
+        var scaledRecipe = await _recipeService.ScaleRecipeAsync(id, servings);
+        return Partial("_IngredientsList", scaledRecipe);
+    }
 }
