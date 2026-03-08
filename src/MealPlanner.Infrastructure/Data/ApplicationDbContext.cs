@@ -26,6 +26,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Pantry> Pantries => Set<Pantry>();
     public DbSet<PantryItem> PantryItems => Set<PantryItem>();
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        // Suppress the warning about pending model changes in production/container
+        optionsBuilder.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
