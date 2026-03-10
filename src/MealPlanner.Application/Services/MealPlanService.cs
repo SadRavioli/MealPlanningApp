@@ -41,7 +41,7 @@ public class MealPlanService : IMealPlanService
             throw new KeyNotFoundException($"MealPlan with ID {id} not found");
 
         // Update meal plan properties
-        mealPlan.WeekStartDate = dto.WeekStartDate;
+        mealPlan.WeekStartDate = DateTime.SpecifyKind(dto.WeekStartDate, DateTimeKind.Utc);
 
         // Update planned meals
         mealPlan.PlannedMeals = [.. dto.PlannedMeals.Select(pm => 

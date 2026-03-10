@@ -37,7 +37,7 @@ public static class MealPlanMapper
         return new MealPlan
         {
             HouseholdId = householdId,
-            WeekStartDate = dto.WeekStartDate,
+            WeekStartDate = DateTime.SpecifyKind(dto.WeekStartDate, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,
             PlannedMeals = dto.PlannedMeals.Select(ToPlannedMealEntity).ToList()
         };
