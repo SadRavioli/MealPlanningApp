@@ -7,6 +7,7 @@ public class ShoppingListItemDto
     public int Id { get; set; }
     public int IngredientId { get; set; }
     public string IngredientName { get; set; } = string.Empty;
+    public string? IngredientCategory { get; set; }
     public decimal Quantity { get; set; }
     public MeasurementUnit Unit { get; set; }
     public bool IsChecked { get; set; }

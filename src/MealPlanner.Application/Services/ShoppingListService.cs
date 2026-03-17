@@ -30,6 +30,12 @@ public class ShoppingListService : IShoppingListService
         return shoppingLists.Select(ShoppingListMapper.ToDto);
     }
 
+    public async Task<ShoppingListItemDto?> GetShoppingListItemByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var shoppingListItem = await _shoppingListRepository.GetListItemByIdAsync(id, cancellationToken);
+        return shoppingListItem == null ? null : ShoppingListMapper.ToItemDto(shoppingListItem);
+    }
+
     public async Task<ShoppingListDto> CreateShoppingListAsync(SaveShoppingListDto dto, int householdId, CancellationToken cancellationToken = default)
     {
         var shoppingList = ShoppingListMapper.ToEntity(dto, householdId);
@@ -43,6 +49,8 @@ public class ShoppingListService : IShoppingListService
         if (mealPlan == null)
             throw new KeyNotFoundException($"Meal plan with ID {mealPlanId} not found");
 
+        var activeList = await _shoppingListRepository.GetActiveListByHouseholdAsync(householdId, cancellationToken);
+
         // Aggregate ingredients from all recipes in the meal plan
         var aggregatedIngredients = new Dictionary<(int IngredientId, string Unit), decimal>();
 
@@ -53,10 +61,8 @@ public class ShoppingListService : IShoppingListService
 
             foreach (var recipeIngredient in plannedMeal.Recipe.RecipeIngredients)
             {
-                // Scale quantity by servings planned
                 var scaleFactor = (decimal)plannedMeal.Servings / plannedMeal.Recipe.ServingSize;
                 var scaledQuantity = recipeIngredient.Quantity * scaleFactor;
-
                 var key = (recipeIngredient.IngredientId, recipeIngredient.Unit.ToString());
 
                 if (aggregatedIngredients.ContainsKey(key))
@@ -66,7 +72,31 @@ public class ShoppingListService : IShoppingListService
             }
         }
 
-        // Create shopping list with aggregated items
+        if (activeList != null)
+        {
+            // Merge into existing list — add quantities for matching ingredients, append new ones
+            foreach (var kvp in aggregatedIngredients)
+            {
+                var unit = Enum.Parse<Domain.Enums.MeasurementUnit>(kvp.Key.Unit);
+                var existing = activeList.Items.FirstOrDefault(i => i.IngredientId == kvp.Key.IngredientId && i.Unit == unit);
+
+                if (existing != null)
+                    existing.Quantity += kvp.Value;
+                else
+                    activeList.Items.Add(new ShoppingListItem
+                    {
+                        IngredientId = kvp.Key.IngredientId,
+                        Quantity = kvp.Value,
+                        Unit = unit,
+                        IsChecked = false
+                    });
+            }
+
+            await _shoppingListRepository.UpdateAsync(activeList, cancellationToken);
+            return ShoppingListMapper.ToDto(activeList);
+        }
+
+        // No existing list — create a new one
         var shoppingList = new ShoppingList
         {
             HouseholdId = householdId,
@@ -116,15 +146,11 @@ public class ShoppingListService : IShoppingListService
 
     public async Task ToggleItemCheckedAsync(int shoppingListId, int itemId, CancellationToken cancellationToken = default)
     {
-        var shoppingList = await _shoppingListRepository.GetByIdWithItemsAsync(shoppingListId, cancellationToken);
-        if (shoppingList == null)
-            throw new KeyNotFoundException($"Shopping list with ID {shoppingListId} not found");
-
-        var item = shoppingList.Items.FirstOrDefault(i => i.Id == itemId);
-        if (item == null)
+        var shoppingListItem = await _shoppingListRepository.GetListItemByIdAsync(itemId, cancellationToken);
+        if (shoppingListItem == null)
             throw new KeyNotFoundException($"Shopping list item with ID {itemId} not found");
 
-        item.IsChecked = !item.IsChecked;
-        await _shoppingListRepository.UpdateAsync(shoppingList, cancellationToken);
+        shoppingListItem.IsChecked = !shoppingListItem.IsChecked;
+        await _shoppingListRepository.UpdateItemAsync(shoppingListItem, cancellationToken);
     }
 }

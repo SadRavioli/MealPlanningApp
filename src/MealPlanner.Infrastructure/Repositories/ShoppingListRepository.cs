@@ -26,4 +26,24 @@ public class ShoppingListRepository : Repository<ShoppingList>, IShoppingListRep
                 .ThenInclude(sli => sli.Ingredient)
             .FirstOrDefaultAsync(sl => sl.Id == id, cancellationToken);
     }
+    
+    public async Task<ShoppingList?> GetActiveListByHouseholdAsync(int householdId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(sl => sl.Items)
+                .ThenInclude(sli => sli.Ingredient)
+            .FirstOrDefaultAsync(sl => sl.HouseholdId == householdId, cancellationToken);
+    }
+
+    public async Task<ShoppingListItem?> GetListItemByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.ShoppingListItems
+            .Include(sli => sli.Ingredient)
+            .FirstOrDefaultAsync(sli => sli.Id == id, cancellationToken);
+    }
+
+    public async Task UpdateItemAsync(ShoppingListItem item, CancellationToken cancellationToken = default)
+    {
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

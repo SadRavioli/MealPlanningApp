@@ -1,0 +1,20 @@
+@model MealPlanner.Application.DTOs.ShoppingLists.ShoppingListItemDto
+
+<div id="shopping-item-@Model.Id" class="flex items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+    <div class="flex-shrink-0">
+        <input type="checkbox" 
+               class="h-6 w-6 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+               @(Model.IsChecked ? "checked" : "")
+               hx-post="@Url.Page("Index", "ToggleItem", new { listId = ViewData["listId"] ?? 0, itemId = Model.Id })"
+               hx-target="#shopping-item-@Model.Id"
+               hx-swap="outerHTML" />
+    </div>
+    <div class="ml-4 flex-1">
+        <p class="text-sm font-medium @(Model.IsChecked ? "text-gray-400 line-through" : "text-gray-900")">
+            @Model.IngredientName
+        </p>
+        <p class="text-xs text-gray-500">
+            @Model.Quantity @Model.Unit.ToString().ToLower()
+        </p>
+    </div>
+</div>

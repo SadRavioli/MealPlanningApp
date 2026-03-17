@@ -26,6 +26,7 @@ public static class ShoppingListMapper
             Id = item.Id,
             IngredientId = item.IngredientId,
             IngredientName = item.Ingredient?.Name ?? string.Empty,
+            IngredientCategory = item.Ingredient?.Category,
             Quantity = item.Quantity,
             Unit = item.Unit,
             IsChecked = item.IsChecked
