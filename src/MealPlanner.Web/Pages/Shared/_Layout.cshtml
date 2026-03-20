@@ -1,6 +1,8 @@
 @{
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
     var isHome = currentPage == "/Index" || currentPage == "";
+    var isFood = currentPage.StartsWith("/Food") || currentPage.StartsWith("/Recipes") || currentPage.StartsWith("/Pantry");
+    var isPlanning = currentPage.StartsWith("/Planning") || currentPage.StartsWith("/MealPlans") || currentPage.StartsWith("/Shopping");
     var isRecipes = currentPage.StartsWith("/Recipes");
     var isMealPlans = currentPage.StartsWith("/MealPlans");
 }
@@ -52,11 +54,11 @@
                             <a asp-area="" asp-page="/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isHome ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
                                 Dashboard
                             </a>
-                            <a asp-area="" asp-page="/Recipes/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isRecipes ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
-                                Recipes
+                            <a asp-area="" asp-page="/Food/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isFood ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
+                                Food
                             </a>
-                            <a asp-area="" asp-page="/MealPlans/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isMealPlans ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
-                                Meal Plan
+                            <a asp-area="" asp-page="/Planning/Index" class="inline-flex items-center px-1 pt-1 text-sm font-medium @(isPlanning ? "text-gray-900 border-b-2 border-primary-500" : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent")">
+                                Planning
                             </a>
                         </div>
                     </div>
@@ -85,39 +87,34 @@
                     <span class="text-xs mt-1">Home</span>
                 </a>
 
-                <!-- Plan -->
-                <a asp-area="" asp-page="/MealPlans/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isMealPlans ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-xs mt-1">Plan</span>
-                </a>
-
-                <!-- Recipes -->
-                <a asp-area="" asp-page="/Recipes/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isRecipes ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
+                <!-- Food -->
+                <a asp-area="" asp-page="/Food/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isFood ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span class="text-xs mt-1">Recipes</span>
+                    <span class="text-xs mt-1">Food</span>
                 </a>
 
-                <!-- More -->
+                <!-- Planning -->
+                <a asp-area="" asp-page="/Planning/Index" class="flex flex-col items-center justify-center flex-1 py-2 transition-colors @(isPlanning ? "text-primary-600" : "text-gray-600 hover:text-primary-500")">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-xs mt-1">Planning</span>
+                </a>
+
+                <!-- Account -->
                 <div x-data="{ open: false }" class="flex flex-col items-center justify-center flex-1 py-2">
                     <button @@click="open = !open" class="flex flex-col items-center justify-center text-gray-600 hover:text-primary-500 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span class="text-xs mt-1">More</span>
+                        <span class="text-xs mt-1">Account</span>
                     </button>
-
-                    <!-- Dropdown Menu -->
                     <div x-show="open"
                          x-transition
                          @@click.away="open = false"
                          class="absolute bottom-16 right-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48">
-                        <a asp-area="" asp-page="/Shopping/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Shopping List</a>
-                        <a asp-area="" asp-page="/Pantry/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Pantry</a>
-                        <hr class="my-2">
                         <a asp-area="" asp-page="/Settings/Index" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
                         <hr class="my-2">
                         <div class="px-4 py-3">
