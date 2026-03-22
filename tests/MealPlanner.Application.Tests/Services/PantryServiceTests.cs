@@ -57,7 +57,7 @@ public class PantryServiceTests
     }
 
     [Fact]
-    public async Task GetPantryByHouseholdIdAsync_ReturnsNull_WhenPantryDoesNotExist()
+    public async Task GetPantryByHouseholdIdAsync_ReturnsEmptyPantryDto_WhenPantryDoesNotExist()
     {
         // Arrange
         _mockPantryRepository
@@ -68,7 +68,8 @@ public class PantryServiceTests
         var result = await _pantryService.GetPantryByHouseholdIdAsync(999);
 
         // Assert
-        result.Should().BeNull();
+        result.Should().NotBeNull();
+        result.Items.Should().BeEmpty();
     }
 
     [Fact]
@@ -123,8 +124,8 @@ public class PantryServiceTests
             .ReturnsAsync(createdPantry);
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(createdPantry);
+            .Setup(r => r.GetPantryItemByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PantryItem { Id = 1, PantryId = 1, IngredientId = 1, Ingredient = new Ingredient { Id = 1, Name = "Rice" }, Quantity = 500, Unit = MeasurementUnit.Gram });
 
         // Act
         var result = await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
@@ -161,8 +162,8 @@ public class PantryServiceTests
             .ReturnsAsync(pantry);
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(pantry);
+            .Setup(r => r.GetPantryItemByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PantryItem { Id = 1, PantryId = 1, IngredientId = 1, Ingredient = new Ingredient { Id = 1, Name = "Rice" }, Quantity = 500, Unit = MeasurementUnit.Gram });
 
         // Act
         var result = await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
@@ -224,42 +225,24 @@ public class PantryServiceTests
     public async Task RemoveItemFromPantryAsync_RemovesItem()
     {
         // Arrange
-        var pantry = new Pantry
+        var item = new PantryItem
         {
             Id = 1,
-            HouseholdId = 100,
-            Items = new List<PantryItem>
-            {
-                new PantryItem
-                {
-                    Id = 1,
-                    PantryId = 1,
-                    IngredientId = 1,
-                    Quantity = 500,
-                    Unit = MeasurementUnit.Gram
-                },
-                new PantryItem
-                {
-                    Id = 2,
-                    PantryId = 1,
-                    IngredientId = 2,
-                    Quantity = 300,
-                    Unit = MeasurementUnit.Gram
-                }
-            }
+            PantryId = 1,
+            IngredientId = 1,
+            Quantity = 500,
+            Unit = MeasurementUnit.Gram
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(pantry);
+            .Setup(r => r.GetPantryItemByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(item);
 
         // Act
         await _pantryService.RemoveItemFromPantryAsync(itemId: 1);
 
         // Assert
-        pantry.Items.Should().HaveCount(1);
-        pantry.Items.Should().NotContain(i => i.Id == 1);
-        _mockPantryRepository.Verify(r => r.UpdateAsync(It.IsAny<Pantry>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPantryRepository.Verify(r => r.RemovePantryItemAsync(item, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -289,16 +272,9 @@ public class PantryServiceTests
     public async Task RemoveItemFromPantryAsync_ThrowsException_WhenItemNotFound()
     {
         // Arrange
-        var pantry = new Pantry
-        {
-            Id = 1,
-            HouseholdId = 100,
-            Items = new List<PantryItem>()
-        };
-
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(pantry);
+            .Setup(r => r.GetPantryItemByIdAsync(999, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PantryItem?)null);
 
         // Act
         Func<Task> act = async () => await _pantryService.RemoveItemFromPantryAsync(itemId: 999);
