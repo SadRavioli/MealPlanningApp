@@ -11,4 +11,5 @@ public class PantryItemDto
     public MeasurementUnit Unit { get; set; }
     public DateTime? ExpiryDate { get; set; }
     public DateTime AddedAt { get; set; }
+    public bool WasExisting { get; set; }
 }

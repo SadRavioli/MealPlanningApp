@@ -7,34 +7,60 @@
 <div class="space-y-6">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Food</h1>
-        <p class="text-gray-500 mt-1">Manage your recipes and pantry.</p>
+        <p class="text-gray-500 mt-1">Manage your pantry and recipes.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <a asp-area="" asp-page="/Recipes/Index"
-           class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow flex items-start space-x-4">
-            <div class="bg-primary-100 rounded-lg p-3 flex-shrink-0">
-                <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-            </div>
-            <div>
-                <h2 class="text-lg font-semibold text-gray-900">Recipes</h2>
-                <p class="text-gray-500 text-sm mt-1">Browse and manage your recipe collection.</p>
-            </div>
-        </a>
+    <!-- Pantry Widget -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Pantry</h2>
+            <!--
+                hx-get: fetches the add form partial from OnGetAddFormAsync
+                hx-target: swaps the form into the #pantry-add-slot div below
+                hx-swap: replaces the contents of the target
+            -->
+            <button hx-get="@Url.Page("Index", "AddForm")"
+                    hx-target="#pantry-add-slot"
+                    hx-swap="innerHTML"
+                    class="text-sm font-medium text-primary-600 hover:text-primary-700">
+                + Add Item
+            </button>
+        </div>
 
-        <a asp-area="" asp-page="/Pantry/Index"
-           class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow flex items-start space-x-4">
-            <div class="bg-primary-100 rounded-lg p-3 flex-shrink-0">
-                <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
+        <!-- This is where the add form will appear when the button is clicked -->
+        <div id="pantry-add-slot"></div>
+
+        <!-- Empty state (hidden once items exist) -->
+        @if (Model.CurrentPantry == null || !Model.CurrentPantry.Items.Any())
+        {
+            <div id="pantry-empty-state" class="p-8 text-center text-gray-400">
+                <p class="text-sm">No items in your pantry yet.</p>
             </div>
-            <div>
-                <h2 class="text-lg font-semibold text-gray-900">Pantry</h2>
-                <p class="text-gray-500 text-sm mt-1">Track what you have at home.</p>
-            </div>
-        </a>
+        }
+
+        <!-- Item list -->
+        <div id="pantry-item-list" class="divide-y divide-gray-100">
+            @if (Model.CurrentPantry != null)
+            {
+                @foreach (var item in Model.CurrentPantry.Items)
+                {
+                    <partial name="_PantryListItem" model="item" />
+                }
+            }
+        </div>
     </div>
+
+    <!-- Recipes link -->
+    <a asp-page="/Recipes/Index"
+       class="block bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="font-semibold text-gray-900">Recipes</h2>
+                <p class="text-sm text-gray-500 mt-1">Browse and manage your recipe collection.</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    </a>
 </div>

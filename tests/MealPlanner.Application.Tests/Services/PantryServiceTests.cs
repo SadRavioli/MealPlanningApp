@@ -44,7 +44,7 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         // Act
@@ -61,7 +61,7 @@ public class PantryServiceTests
     {
         // Arrange
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdAsync(999, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(999, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Pantry?)null);
 
         // Act
@@ -115,7 +115,7 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdAsync(100, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(100, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Pantry?)null);
 
         _mockPantryRepository
@@ -123,7 +123,7 @@ public class PantryServiceTests
             .ReturnsAsync(createdPantry);
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(createdPantry);
 
         // Act
@@ -157,11 +157,11 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByHouseholdIdAsync(100, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(100, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         // Act
@@ -207,7 +207,7 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         // Act
@@ -250,11 +250,11 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         // Act
-        await _pantryService.RemoveItemFromPantryAsync(pantryId: 1, itemId: 1);
+        await _pantryService.RemoveItemFromPantryAsync(itemId: 1);
 
         // Assert
         pantry.Items.Should().HaveCount(1);
@@ -274,7 +274,7 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(999, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(999, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Pantry?)null);
 
         // Act
@@ -297,11 +297,11 @@ public class PantryServiceTests
         };
 
         _mockPantryRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByHouseholdIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pantry);
 
         // Act
-        Func<Task> act = async () => await _pantryService.RemoveItemFromPantryAsync(pantryId: 1, itemId: 999);
+        Func<Task> act = async () => await _pantryService.RemoveItemFromPantryAsync(itemId: 999);
 
         // Assert
         await act.Should().ThrowAsync<KeyNotFoundException>()

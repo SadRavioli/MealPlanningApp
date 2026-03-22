@@ -99,7 +99,7 @@ public class PantriesController : ControllerBase
     {
         try
         {
-            await _pantryService.RemoveItemFromPantryAsync(pantryId, itemId, cancellationToken);
+            await _pantryService.RemoveItemFromPantryAsync(itemId, cancellationToken);
             return NoContent();
         }
         catch (KeyNotFoundException)

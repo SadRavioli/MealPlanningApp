@@ -16,8 +16,14 @@ public class PantryService : IPantryService
 
     public async Task<PantryDto?> GetPantryByHouseholdIdAsync(int householdId, CancellationToken cancellationToken = default)
     {
-        var pantry = await _pantryRepository.GetByHouseholdIdAsync(householdId, cancellationToken);
-        return pantry == null ? null : PantryMapper.ToDto(pantry);
+        var pantry = await _pantryRepository.GetByHouseholdIdWithItemsAsync(householdId, cancellationToken);
+        return pantry == null ? new PantryDto() : PantryMapper.ToDto(pantry);
+    }
+
+    public async Task<PantryItemDto?> GetPantryItemByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var pantryItem = await _pantryRepository.GetPantryItemByIdAsync(id, cancellationToken);
+        return pantryItem == null ? null : PantryMapper.ToItemDto(pantryItem);
     }
 
     public async Task<PantryDto> CreatePantryAsync(int householdId, CancellationToken cancellationToken = default)
@@ -32,24 +38,34 @@ public class PantryService : IPantryService
 
     public async Task<PantryItemDto> AddItemToPantryAsync(int householdId, SavePantryItemDto dto, CancellationToken cancellationToken = default)
     {
-        // Get or create pantry using the separate methods
-        var pantryDto = await GetPantryByHouseholdIdAsync(householdId, cancellationToken);
-        pantryDto ??= await CreatePantryAsync(householdId, cancellationToken);
+        var pantry = await _pantryRepository.GetByHouseholdIdWithItemsAsync(householdId, cancellationToken);
+        if (pantry == null)
+            pantry = await _pantryRepository.AddAsync(new Pantry { HouseholdId = householdId }, cancellationToken);
 
-        var pantry = await _pantryRepository.GetByIdWithItemsAsync(pantryDto.Id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Pantry for household {householdId} not found");
+        var existingItem = pantry.Items.FirstOrDefault(i => 
+            i.IngredientId == dto.IngredientId && 
+            i.ExpiryDate == dto.ExpiryDate);
+
+        if (existingItem != null)
+        {
+            existingItem.Quantity += dto.Quantity;
+            await _pantryRepository.UpdateAsync(pantry, cancellationToken);
+            var itemDto = await GetPantryItemByIdAsync(existingItem.Id, cancellationToken)
+                ?? throw new Exception("Failed to retrieve pantry item");
+            itemDto.WasExisting = true;
+            return itemDto;
+        }
 
         var newItem = PantryMapper.ToItemEntity(dto, pantry.Id);
         pantry.Items.Add(newItem);
-
         await _pantryRepository.UpdateAsync(pantry, cancellationToken);
-
-        return PantryMapper.ToItemDto(newItem);
+        return await GetPantryItemByIdAsync(newItem.Id, cancellationToken)
+            ?? throw new Exception("Failed to retrieve newly added pantry item");
     }
 
     public async Task UpdatePantryItemAsync(int pantryId, int itemId, SavePantryItemDto dto, CancellationToken cancellationToken = default)
     {
-        var pantry = await _pantryRepository.GetByIdWithItemsAsync(pantryId, cancellationToken);
+        var pantry = await _pantryRepository.GetByHouseholdIdWithItemsAsync(pantryId, cancellationToken);
         if (pantry == null)
             throw new KeyNotFoundException($"Pantry with ID {pantryId} not found");
 
@@ -65,17 +81,12 @@ public class PantryService : IPantryService
         await _pantryRepository.UpdateAsync(pantry, cancellationToken);
     }
 
-    public async Task RemoveItemFromPantryAsync(int pantryId, int itemId, CancellationToken cancellationToken = default)
+    public async Task RemoveItemFromPantryAsync(int itemId, CancellationToken cancellationToken = default)
     {
-        var pantry = await _pantryRepository.GetByIdWithItemsAsync(pantryId, cancellationToken);
-        if (pantry == null)
-            throw new KeyNotFoundException($"Pantry with ID {pantryId} not found");
-
-        var item = pantry.Items.FirstOrDefault(i => i.Id == itemId);
+        var item = await _pantryRepository.GetPantryItemByIdAsync(itemId, cancellationToken);
         if (item == null)
             throw new KeyNotFoundException($"Pantry item with ID {itemId} not found");
 
-        pantry.Items.Remove(item);
-        await _pantryRepository.UpdateAsync(pantry, cancellationToken);
+        await _pantryRepository.RemovePantryItemAsync(item, cancellationToken);
     }
 }
