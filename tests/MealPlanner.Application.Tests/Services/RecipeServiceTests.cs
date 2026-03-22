@@ -179,7 +179,7 @@ public class RecipeServiceTests
         };
 
         _mockRecipeRepository
-            .Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByIdWithIngredientsAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingRecipe);
 
         // Act

@@ -251,15 +251,15 @@ public class ShoppingListServiceTests
         };
 
         _mockShoppingListRepository
-            .Setup(r => r.GetByIdWithItemsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(shoppingList);
+            .Setup(r => r.GetListItemByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(shoppingList.Items.First());
 
         // Act
         await _shoppingListService.ToggleItemCheckedAsync(shoppingListId: 1, itemId: 1);
 
         // Assert
         shoppingList.Items.First().IsChecked.Should().BeTrue();
-        _mockShoppingListRepository.Verify(r => r.UpdateAsync(It.IsAny<ShoppingList>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockShoppingListRepository.Verify(r => r.UpdateItemAsync(It.IsAny<ShoppingListItem>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
