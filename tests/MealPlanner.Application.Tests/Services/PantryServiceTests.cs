@@ -128,12 +128,12 @@ public class PantryServiceTests
             .ReturnsAsync(new PantryItem { Id = 1, PantryId = 1, IngredientId = 1, Ingredient = new Ingredient { Id = 1, Name = "Rice" }, Quantity = 500, Unit = MeasurementUnit.Gram });
 
         // Act
-        var result = await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
+        await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
 
         // Assert
-        result.Should().NotBeNull();
-        result.IngredientId.Should().Be(1);
-        result.Quantity.Should().Be(500);
+        createdPantry.Items.Should().HaveCount(1);
+        createdPantry.Items.First().IngredientId.Should().Be(1);
+        createdPantry.Items.First().Quantity.Should().Be(500);
         _mockPantryRepository.Verify(r => r.AddAsync(It.IsAny<Pantry>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockPantryRepository.Verify(r => r.UpdateAsync(It.IsAny<Pantry>(), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -166,13 +166,12 @@ public class PantryServiceTests
             .ReturnsAsync(new PantryItem { Id = 1, PantryId = 1, IngredientId = 1, Ingredient = new Ingredient { Id = 1, Name = "Rice" }, Quantity = 500, Unit = MeasurementUnit.Gram });
 
         // Act
-        var result = await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
+        await _pantryService.AddItemToPantryAsync(householdId: 100, dto);
 
         // Assert
-        result.Should().NotBeNull();
-        result.IngredientId.Should().Be(1);
-        result.Quantity.Should().Be(500);
         pantry.Items.Should().HaveCount(1);
+        pantry.Items.First().IngredientId.Should().Be(1);
+        pantry.Items.First().Quantity.Should().Be(500);
         _mockPantryRepository.Verify(r => r.AddAsync(It.IsAny<Pantry>(), It.IsAny<CancellationToken>()), Times.Never);
         _mockPantryRepository.Verify(r => r.UpdateAsync(It.IsAny<Pantry>(), It.IsAny<CancellationToken>()), Times.Once);
     }
